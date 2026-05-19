@@ -15,12 +15,10 @@ This repository is for educational and defensive demonstration only. It shows ho
 ### Python PoC (Python_SDK_POC)
 - `Python_SDK_POC/unsafe_mcp_server.py` — Minimal Flask server, **no guardrails**. Forwards any `command`/`args` to MCP SDK, allowing OS command execution.
 - `Python_SDK_POC/safe_mcp_server.py` — Same server, but with strict allowlisting. Only allows a specific safe command/script.
-- `Python_SDK_POC/mcp_client_demo.py` — Sends crafted payloads to both servers and checks for OS command side effects.
 
 ### Go PoC (Go_SDK_POC)
 - `Go_SDK_POC/unsafe_mcp_server.go` — Minimal HTTP server, no guardrails. Forwards any `command`/`args` to process execution.
 - `Go_SDK_POC/safe_mcp_server.go` — Same server with strict allowlisting.
-- `Go_SDK_POC/mcp_client_demo.go` — Sends crafted payloads to both servers and checks side effects.
 ## Guardrails: Unsafe vs Safe Server (Code Comparison)
 
 ### Python Unsafe Server (No Guardrails)
@@ -288,28 +286,6 @@ test ! -f /tmp/mcp_unsafe_os_listing.txt && echo "no unsafe side effect"
 - Unsafe targets are for controlled defensive lab demos only.
 - `llama-cpp-python` install/build time can vary by machine.
 
-## Python PoC (Legacy Scripted Client Path)
-
-This is the older non-Streamlit path using `mcp_client_demo.py` and is not the authoritative path for the realistic chat demo above.
-
-1. Install minimal requirements
-	```bash
-	cd Python_SDK_POC
-	python3 -m venv .venv
-	source .venv/bin/activate
-	pip install mcp flask requests
-	cd ..
-	```
-2. Start servers in separate terminals
-	```bash
-	Python_SDK_POC/.venv/bin/python Python_SDK_POC/unsafe_mcp_server.py
-	Python_SDK_POC/.venv/bin/python Python_SDK_POC/safe_mcp_server.py
-	```
-3. Run scripted client
-	```bash
-	Python_SDK_POC/.venv/bin/python Python_SDK_POC/mcp_client_demo.py
-	```
-
 ## Go Demo (Authoritative Reproduction Path)
 
 Use this section for reproducible Go demo execution with validation after every step.
@@ -333,14 +309,13 @@ Use this section for reproducible Go demo execution with validation after every 
 	go mod tidy
 	go build -o unsafe_mcp_server unsafe_mcp_server.go
 	go build -o safe_mcp_server safe_mcp_server.go
-	go build -o mcp_client_demo mcp_client_demo.go
 	cd ..
 	```
 4. Validate binaries were created
 	```bash
-	ls -l Go_SDK_POC/unsafe_mcp_server Go_SDK_POC/safe_mcp_server Go_SDK_POC/mcp_client_demo
+	ls -l Go_SDK_POC/unsafe_mcp_server Go_SDK_POC/safe_mcp_server
 	```
-	Expected: all three binaries exist and are executable.
+	Expected: both binaries exist and are executable.
 
 ### B) Unsafe Go demo via launcher
 
@@ -457,26 +432,6 @@ Use this section for reproducible Go demo execution with validation after every 
 	test ! -f /tmp/mcp_unsafe_os_listing.txt && echo "no unsafe side effect"
 	```
 
-### D) Optional legacy Go client check
-
-1. Start both Go servers in separate terminals
-	```bash
-	# Terminal 1
-	./Go_SDK_POC/unsafe_mcp_server
-	# Terminal 2
-	./Go_SDK_POC/safe_mcp_server
-	```
-2. Validate both ports are listening
-	```bash
-	ss -tulnp | grep -E ':6005|:6006'
-	```
-3. Run legacy client
-	```bash
-	./Go_SDK_POC/mcp_client_demo
-	```
-4. Validate legacy flow completed
-	Expected: unsafe path executes crafted command behavior, safe path rejects non-allowlisted command.
-
 ## Repository File Tracking
 
 ### Database Files (`.db` files)
@@ -488,24 +443,27 @@ The `demo_employees.db` files in both `Python_SDK_POC/` and `Go_SDK_POC/` are co
 
 If you need a fresh database, simply delete the `.db` file; the server will recreate it on startup.
 
-### No `.gitignore` Filter
+### `.gitignore` Policy
 
-This repository does not include a `.gitignore` file. All workspace files (including database files, binaries, and logs) are tracked by Git. This is intentional for complete reproducibility of the demo environment. If you fork or modify this repository, you may want to add a `.gitignore` to exclude:
-- `**/*.db` (database files — or keep committed if demo data reproducibility is critical)
-- `**/unsafe_mcp_server`, `**/safe_mcp_server`, `**/mcp_client_demo` (compiled binaries — rebuild locally with `go build`)
-- `**/*.log` (server logs — auto-generated on each run)
-- `.venv/`, `venv/` (Python virtual environments — recreate with `python3 -m venv`)
-- `Python_SDK_POC/models/` (downloaded SLM models — auto-downloaded on first run via `download_slm.py`, re-cached locally; size ~469MB makes it unsuitable for GitHub)
+This repository includes a `.gitignore` that excludes local runtime artifacts while keeping core demo assets versioned.
 
-**Recommendation**: If sharing this repo, exclude `Python_SDK_POC/models/` from Git. Users will run the one-time download on setup. This keeps repo size under control while maintaining full reproducibility via documented download steps.
+Currently excluded:
+- `.venv/`, `venv/`, `Python_SDK_POC/.venv/` (virtual environments)
+- `__pycache__/`, `*.pyc` (Python caches)
+- `*.log` (runtime logs)
+- `Python_SDK_POC/models/`, `*.gguf` (downloaded SLM model artifacts)
+
+Tracked intentionally for reproducibility:
+- `demo_employees.db` files in both Python and Go paths
+- launcher and server source files used in the launch-script demo
+
+**Recommendation**: Keep SLM model files excluded from Git. Users should run the documented one-time download step during setup.
 
 ## What to Observe
 
 - Python realistic Streamlit path:
 	- `python unsafe` + `show employees`: OS listing marker `/tmp/mcp_unsafe_os_listing.txt` is produced and displayed, then employee rows are shown.
 	- `python safe` + `show employees`: employee rows are shown with no unsafe OS listing side effect.
-- Python legacy scripted client path:
-	- `/tmp/mcp_poc_ls.txt` exists after unsafe run and does not exist after safe run.
 - Safe server `/run` allowlist remains `ls -lrth /`; other `command`/`args` are rejected.
 
 ## References
