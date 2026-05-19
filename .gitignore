@@ -1,0 +1,15 @@
+# Python environments
+.venv/
+venv/
+Python_SDK_POC/.venv/
+
+# Python caches
+__pycache__/
+*.pyc
+
+# Logs
+*.log
+
+# Downloaded SLM model artifacts
+Python_SDK_POC/models/
+*.gguf

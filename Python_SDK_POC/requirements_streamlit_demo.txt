@@ -1,0 +1,6 @@
+flask>=3.0.0
+requests>=2.31.0
+streamlit>=1.35.0
+huggingface_hub>=0.24.0
+llama-cpp-python>=0.2.90
+mcp>=1.0.0
