@@ -13,6 +13,19 @@
 
 This repository is for educational and defensive demonstration only. It shows how applications using Anthropic MCP SDK patterns can be vulnerable to OS command execution if developer guardrails are not implemented, and how validation can prevent this risk. Do not use the unsafe pattern in production.
 
+## Tested Environment
+
+The demo and validation steps in this README were executed on:
+
+- OS: Ubuntu 24.04.4 LTS
+- Kernel: 6.17.0-23-generic
+- Python: 3.12.3
+- Go: go1.26.2 linux/amd64
+
+Notes:
+- Streamlit UI target port: `8501`
+- MCP server ports: Python (`5005`/`5006`), Go (`6005`/`6006`)
+
 ## Demo Video
 
 - [Screencast from 2026-05-19 16-41-18.webm](Screencast%20from%202026-05-19%2016-41-18.webm)
@@ -461,3 +474,5 @@ If you need a fresh database, simply delete the `.db` file; the server will recr
 ## References
 
 - [OX Security: The Mother of All AI Supply Chains](https://www.ox.security/blog/the-mother-of-all-ai-supply-chains-critical-systemic-vulnerability-at-the-core-of-the-mcp/)
+
+This project is licensed under the GNU General Public License v3.0 - see the [LICENSE](LICENSE) file for details.
