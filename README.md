@@ -1,6 +1,14 @@
 
 # MCP STDIO Command Execution PoC (Defensive Demo)
 
+![PoC](https://img.shields.io/badge/PoC-Defensive%20Demo-orange)
+![MCP](https://img.shields.io/badge/MCP-STDIO-blue)
+![Python](https://img.shields.io/badge/Python-3.x-3776AB?logo=python&logoColor=white)
+![Go](https://img.shields.io/badge/Go-1.x-00ADD8?logo=go&logoColor=white)
+![UI](https://img.shields.io/badge/UI-Streamlit-FF4B4B?logo=streamlit&logoColor=white)
+![SLM](https://img.shields.io/badge/SLM-Local%20GGUF-green)
+![Launcher](https://img.shields.io/badge/Run%20Mode-launch__demo.sh-black)
+
 **Educational Purpose Disclaimer:**
 
 This repository is for educational and defensive demonstration only. It shows how applications using Anthropic MCP SDK patterns can be vulnerable to OS command execution if developer guardrails are not implemented, and how validation can prevent this risk. Do not use the unsafe pattern in production.
@@ -442,22 +450,6 @@ The `demo_employees.db` files in both `Python_SDK_POC/` and `Go_SDK_POC/` are co
 - Faster validation and reproducibility
 
 If you need a fresh database, simply delete the `.db` file; the server will recreate it on startup.
-
-### `.gitignore` Policy
-
-This repository includes a `.gitignore` that excludes local runtime artifacts while keeping core demo assets versioned.
-
-Currently excluded:
-- `.venv/`, `venv/`, `Python_SDK_POC/.venv/` (virtual environments)
-- `__pycache__/`, `*.pyc` (Python caches)
-- `*.log` (runtime logs)
-- `Python_SDK_POC/models/`, `*.gguf` (downloaded SLM model artifacts)
-
-Tracked intentionally for reproducibility:
-- `demo_employees.db` files in both Python and Go paths
-- launcher and server source files used in the launch-script demo
-
-**Recommendation**: Keep SLM model files excluded from Git. Users should run the documented one-time download step during setup.
 
 ## What to Observe
 
