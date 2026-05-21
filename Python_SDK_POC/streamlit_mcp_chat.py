@@ -64,7 +64,10 @@ def generate_json_response(llm: Llama, prompt: str, max_tokens: int) -> dict[str
         temperature=0.2,
         stop=["\nUser:", "\nSystem:"],
     )
-    raw = result["choices"][0]["text"].strip()
+    if not isinstance(result, dict):
+        raise TypeError("Expected non-stream completion result")
+
+    raw = str(result["choices"][0]["text"]).strip()
 
     try:
         payload = json.loads(raw)

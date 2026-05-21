@@ -2,3 +2,4 @@
 2026/05/18 15:51:55 listen tcp :6005: bind: address already in use
 2026/05/18 15:55:55 UNSAFE Go MCP server running on http://127.0.0.1:6005
 2026/05/19 16:45:15 UNSAFE Go MCP server running on http://127.0.0.1:6005
+2026/05/21 12:57:35 UNSAFE Go MCP server running on http://127.0.0.1:6005

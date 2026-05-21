@@ -13,6 +13,32 @@
 
 This repository is for educational and defensive demonstration only. It shows how applications using Anthropic MCP SDK patterns can be vulnerable to OS command execution if developer guardrails are not implemented, and how validation can prevent this risk. Do not use the unsafe pattern in production.
 
+## Client-Side Poisoning Vectors
+
+Untrusted `command`/`args` can be introduced from multiple client/config surfaces, including:
+
+- `.vscode/mcp.json`
+- LangChain/LangGraph/LiteLLM-style integration layers
+- Streamlit UI payload generation (this repository)
+
+Client-side poisoning is the source. Execution occurs only when server/runtime code forwards those fields into process-launch paths without guardrails.
+
+## This Repository's Exact Mapping
+
+- Source in this repo: `Python_SDK_POC/streamlit_mcp_chat.py` crafts and sends payloads to `/run`.
+- Sink in this repo: unsafe server handlers forward payload values into process-launch logic.
+- Security equivalence: same vulnerability class as `mcp.json` poisoning, demonstrated here via API/UI payload flow.
+
+## Why STDIO Transport Is Central
+
+STDIO transport is process-based: it starts an OS process and communicates over stdin/stdout pipes. If untrusted `command`/`args` are allowed into that startup path, process spawn is the execution sink.
+
+This is why strict guardrails are required before STDIO spawn.
+
+## Mitigation Principle
+
+Treat all client/config-supplied `command`/`args` as untrusted, and enforce strict allowlist/schema validation before any STDIO process launch.
+
 ## Tested Environment
 
 The demo and validation steps in this README were executed on:
@@ -38,8 +64,8 @@ Notes:
 - `Python_SDK_POC/safe_mcp_server.py` — Same server, but with strict allowlisting. Only allows a specific safe command/script.
 
 ### Go PoC (Go_SDK_POC)
-- `Go_SDK_POC/unsafe_mcp_server.go` — Minimal HTTP server, no guardrails. Forwards any `command`/`args` to process execution.
-- `Go_SDK_POC/safe_mcp_server.go` — Same server with strict allowlisting.
+- `Go_SDK_POC/cmd/unsafe_mcp_server/main.go` — Minimal HTTP server, no guardrails. Forwards any `command`/`args` to process execution.
+- `Go_SDK_POC/cmd/safe_mcp_server/main.go` — Same server with strict allowlisting.
 ## Guardrails: Unsafe vs Safe Server (Code Comparison)
 
 ### Python Unsafe Server (No Guardrails)
@@ -320,7 +346,7 @@ Use this section for reproducible Go demo execution with validation after every 
 2. Validate you are in the correct folder
 	```bash
 	pwd
-	ls -l launch_demo.sh Go_SDK_POC/unsafe_mcp_server.go Go_SDK_POC/safe_mcp_server.go
+	ls -l launch_demo.sh Go_SDK_POC/cmd/unsafe_mcp_server/main.go Go_SDK_POC/cmd/safe_mcp_server/main.go
 	```
 	Expected: `pwd` ends with `MCP-Disclosures`, and all listed files exist.
 
@@ -328,8 +354,8 @@ Use this section for reproducible Go demo execution with validation after every 
 	```bash
 	cd Go_SDK_POC
 	go mod tidy
-	go build -o unsafe_mcp_server unsafe_mcp_server.go
-	go build -o safe_mcp_server safe_mcp_server.go
+	go build -o unsafe_mcp_server ./cmd/unsafe_mcp_server
+	go build -o safe_mcp_server ./cmd/safe_mcp_server
 	cd ..
 	```
 4. Validate binaries were created

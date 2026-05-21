@@ -40,18 +40,18 @@ if [[ "$STACK" == "python" ]]; then
   fi
 else
   if [[ "$MODE" == "safe" ]]; then
-    GO_FILE="$GO_DIR/safe_mcp_server.go"
+    GO_PKG="./cmd/safe_mcp_server"
     GO_BIN="$GO_DIR/safe_mcp_server"
     MCP_URL="http://127.0.0.1:6006/run"
   else
-    GO_FILE="$GO_DIR/unsafe_mcp_server.go"
+    GO_PKG="./cmd/unsafe_mcp_server"
     GO_BIN="$GO_DIR/unsafe_mcp_server"
     MCP_URL="http://127.0.0.1:6005/run"
   fi
 
   if [[ ! -x "$GO_BIN" ]]; then
-    echo "Building $GO_FILE ..."
-    (cd "$GO_DIR" && go build "$(basename "$GO_FILE")")
+    echo "Building $GO_PKG ..."
+    (cd "$GO_DIR" && go build -o "$(basename "$GO_BIN")" "$GO_PKG")
   fi
   MCP_CMD=("$GO_BIN")
 fi
